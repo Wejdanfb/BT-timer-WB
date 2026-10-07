@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Blood Transfusion Vital Signs Timer - TEST</title>
+<title>Blood Transfusion Vital Signs Timer</title>
 <style>
   :root{
     /* Palette sourced from the uploaded reference image */
@@ -51,7 +51,9 @@
        interval color system). */
     --shadow: 0 2px 10px rgba(55,53,206,0.12);
   }
-  * { box-sizing: border-box; }
+  *, *::before, *::after { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+  img, input, select, textarea, button { max-width: 100%; }
   html, body {
     margin:0; padding:0;
     background: var(--bg);
@@ -107,7 +109,17 @@
   }
   .setup-card input[type="time"],
   .setup-card select {
+    /* Mobile overflow fix: iOS/Android give time inputs and selects an
+       intrinsic native width that ignores width:100%. Strip the native
+       appearance and pin them to the container. */
+    display: block;
     width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    margin: 0;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
     font-size: 20px;
     padding: 14px 12px;
     border-radius: 10px;
@@ -117,7 +129,17 @@
     font-weight: 600;
     font-family: inherit;
   }
-  .setup-card select { font-size: 16px; cursor: pointer; }
+  .setup-card input[type="time"] { min-height: 56px; line-height: 1.2; text-align: left; }
+  .setup-card input[type="time"]::-webkit-date-and-time-value { text-align: left; min-width: 0; }
+  .setup-card select {
+    font-size: 16px; cursor: pointer; min-height: 56px;
+    padding-right: 40px;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='9' viewBox='0 0 14 9'><path d='M1 1.5l6 6 6-6' fill='none' stroke='%235b5470' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/></svg>");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    background-size: 14px 9px;
+  }
+  .field-block, .setup-card, .custom-end-wrap { min-width: 0; max-width: 100%; }
   .setup-card input[type="time"]:focus,
   .setup-card select:focus {
     outline: none;
@@ -736,7 +758,7 @@
 
 <div id="app">
   <header class="topbar">
-    <h1>Blood Transfusion Vital Signs Timer - TEST</h1>
+    <h1>Blood Transfusion Vital Signs Timer</h1>
   </header>
 
   <main>
