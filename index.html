@@ -1431,11 +1431,76 @@
     if (tickHandle) { clearInterval(tickHandle); tickHandle = null; }
     sessionEndTime = new Date();
     isPaused = true;
-    activeScreen.classList.add('hidden');
-    reactionScreen.classList.add('hidden');
-    summaryScreen.classList.remove('hidden');
     renderSummary();
+    navigate('summary');
   }
+
+  // ---------- Internal navigation (History API) ----------
+  // Every screen change is a history entry, so the browser/iPhone Back button
+  // moves between screens INSIDE the app. View changes only show/hide
+  // sections; they never touch timer, schedule, CHECK, PAUSE or reaction state.
+  var VIEW_ORDER = ['setup', 'monitoring', 'reaction', 'summary', 'developer'];
+  var currentView = 'setup';
+
+  function viewElement(view) {
+    return { setup: setupScreen, monitoring: activeScreen, reaction: reactionScreen,
+             summary: summaryScreen, developer: profileScreen }[view];
+  }
+  function currentIdx() {
+    return (history.state && typeof history.state.idx === 'number') ? history.state.idx : 0;
+  }
+  // Maps a requested view to one that is valid for the current session.
+  function resolveView(view) {
+    if (VIEW_ORDER.indexOf(view) === -1) return 'setup';
+    if (view === 'developer' || view === 'setup') return view;
+    if (!startTime) return 'setup';
+    if (sessionEndTime) return 'summary';
+    if (view === 'summary') return 'monitoring';
+    return view;
+  }
+  // Display only — never touches history.
+  function showView(view) {
+    view = resolveView(view);
+    VIEW_ORDER.forEach(function(v){ viewElement(v).classList.add('hidden'); });
+    viewElement(view).classList.remove('hidden');
+    currentView = view;
+    if (view === 'monitoring' && startTime) render();
+    if (view === 'reaction' && startTime) renderReactionList();
+    window.scrollTo(0, 0);
+    return view;
+  }
+  // User-initiated transition: show the view AND register a history entry.
+  function navigate(view) {
+    view = resolveView(view);
+    if (view === currentView) return;
+    showView(view);
+    try { history.pushState({ view: view, idx: currentIdx() + 1 }, '', '#' + view); } catch (e) {}
+  }
+  // In-app "back" buttons: use real history so the stack stays clean.
+  function goBackTo(fromView, fallbackView) {
+    if (history.state && history.state.view === fromView && currentIdx() > 0) {
+      history.back(); // popstate handler shows the previous screen
+    } else {
+      navigate(fallbackView);
+    }
+  }
+  // After a full reset, return to the first (Setup) entry so Back doesn't
+  // walk through stale screens.
+  function resetToSetupHistory() {
+    showView('setup');
+    var idx = currentIdx();
+    if (idx > 0) { try { history.go(-idx); } catch (e) {} }
+    else { try { history.replaceState({ view: 'setup', idx: 0 }, '', '#setup'); } catch (e) {} }
+  }
+  window.addEventListener('popstate', function(e){
+    var wanted = (e.state && e.state.view) || (location.hash || '').replace('#', '');
+    var shown = showView(wanted);  // display only: no pushState here
+    if (!e.state || e.state.view !== shown) {
+      try { history.replaceState({ view: shown, idx: (e.state && e.state.idx) || 0 }, '', '#' + shown); } catch (err) {}
+    }
+  });
+  // Initial entry is Setup (replace, not push: no extra history entry).
+  try { history.replaceState({ view: 'setup', idx: 0 }, '', '#setup'); } catch (e) {}
 
   // ---------- Controls ----------
   function startTimer() {
@@ -1462,14 +1527,13 @@
     ensureAudioCtx();
     requestNotificationPermission();
 
-    setupScreen.classList.add('hidden');
-    activeScreen.classList.remove('hidden');
     statusPill.textContent = 'Active';
     statusPill.className = 'status-pill active';
 
     if (tickHandle) clearInterval(tickHandle);
     tick();
     tickHandle = setInterval(tick, 1000);
+    navigate('monitoring');
   }
 
   function togglePause() {
@@ -1501,29 +1565,23 @@
     reactionOpened = false;
     pauseBtn.textContent = 'PAUSE TIMER';
     alertBanner.classList.add('hidden');
-    activeScreen.classList.add('hidden');
-    reactionScreen.classList.add('hidden');
-    summaryScreen.classList.add('hidden');
-    setupScreen.classList.remove('hidden');
     resetModal.classList.add('hidden');
     durationSelect.value = '240';
     customEndWrap.classList.add('hidden');
     endTimeInput.value = '';
     setDefaultStartTime();
     updateDurationPreview();
+    resetToSetupHistory();
   }
 
   function openReaction() {
     reactionOpened = true;
-    activeScreen.classList.add('hidden');
-    reactionScreen.classList.remove('hidden');
     renderReactionList();
+    navigate('reaction');
   }
 
   function backToMonitoring() {
-    reactionScreen.classList.add('hidden');
-    activeScreen.classList.remove('hidden');
-    render();
+    goBackTo('reaction', 'monitoring');
   }
 
   // ---------- Event wiring ----------
@@ -1538,25 +1596,10 @@
   backToMonitoringBtn.addEventListener('click', backToMonitoring);
 
   // ---------- Developer Profile (view only — never touches timer state) ----------
-  var screenBeforeProfile = null;
-  function openProfile() {
-    var current = [setupScreen, activeScreen, reactionScreen, summaryScreen].filter(function(s){
-      return !s.classList.contains('hidden');
-    })[0];
-    if (!current) return;
-    screenBeforeProfile = current;
-    current.classList.add('hidden');
-    profileScreen.classList.remove('hidden');
-    window.scrollTo(0, 0);
-  }
-  function closeProfile() {
-    profileScreen.classList.add('hidden');
-    (screenBeforeProfile || setupScreen).classList.remove('hidden');
-    screenBeforeProfile = null;
-    window.scrollTo(0, 0);
-  }
+  function openProfile() { navigate('developer'); }
+  function closeProfile() { goBackTo('developer', 'setup'); }
   devLink.addEventListener('click', function(){
-    if (profileScreen.classList.contains('hidden')) openProfile();
+    openProfile();
   });
   profileBackBtn.addEventListener('click', closeProfile);
 
