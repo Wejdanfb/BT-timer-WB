@@ -8,7 +8,8 @@
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
   gtag('js', new Date());
-  gtag('config', 'G-51ZR46CS71');
+  // Add ?ga_debug=1 to the URL to make this visit appear in GA4 DebugView.
+  gtag('config', 'G-51ZR46CS71', /[?&]ga_debug=1/.test(location.search) ? { debug_mode: true } : {});
 </script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Blood Transfusion Vital Signs Timer</title>
@@ -759,6 +760,65 @@
     border-radius: 12px; letter-spacing: 0.3px;
   }
   .btn-profile-back:active { transform: scale(0.98); }
+
+  /* ---- Admin Analytics page ---- */
+  .admin-link {
+    display: block; margin: 18px auto 0; padding: 6px 10px;
+    background: none; border: none; font: inherit; font-size: 11px;
+    color: #8f889f; text-decoration: underline; cursor: pointer;
+  }
+  #adminScreen {
+    font-family: "Portada ARA", "Portada", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    font-weight: 400;
+  }
+  #adminScreen h2, #adminScreen h3, #adminScreen .admin-btn, #adminScreen .kpi-value {
+    font-family: "Portada ARA", "Portada", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    font-weight: 700;
+  }
+  .admin-card {
+    background: var(--card); border: 1px solid var(--border);
+    border-top: 4px solid var(--primary); border-radius: 14px;
+    box-shadow: var(--shadow); padding: 22px 16px 20px; margin-top: 12px;
+  }
+  .admin-card h2 { font-size: 18px; color: var(--primary-deep); margin: 0 0 4px; }
+  .admin-sub { font-size: 12px; color: var(--muted); margin: 0 0 14px; line-height: 1.45; }
+  .admin-status {
+    font-size: 13px; line-height: 1.5; padding: 10px 12px; border-radius: 10px;
+    background: var(--primary-tint); color: var(--text); border: 1px solid var(--border);
+    margin-bottom: 14px;
+  }
+  .admin-status.ok { background: var(--completed-bg); }
+  .admin-section { font-size: 13px; color: var(--secondary-plum); letter-spacing: .6px; text-transform: uppercase; margin: 20px 0 8px; }
+  .range-row { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
+  .range-btn {
+    flex: 1 1 auto; padding: 9px 8px; font: inherit; font-size: 13px; font-weight: 700;
+    color: var(--primary-deep); background: var(--primary-tint);
+    border: 1px solid var(--border); border-radius: 10px; cursor: pointer;
+  }
+  .range-btn.active { color: #fff; background: var(--primary); border-color: var(--primary); }
+  .custom-range { display: flex; gap: 8px; margin-bottom: 8px; }
+  .custom-range input, .admin-key input {
+    flex: 1 1 0; min-width: 0; padding: 9px; font: inherit; font-size: 14px;
+    border: 1px solid var(--border); border-radius: 10px; background: #fff; color: var(--text);
+  }
+  .admin-key { display: flex; gap: 8px; margin-bottom: 12px; }
+  .admin-btn {
+    padding: 10px 14px; font-size: 13px; color: #fff; border: none; border-radius: 10px;
+    background: linear-gradient(135deg, var(--primary-deep), var(--primary)); cursor: pointer;
+  }
+  .kpi-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+  .kpi {
+    background: var(--bg); border: 1px solid var(--border); border-radius: 12px;
+    padding: 12px 10px; min-width: 0;
+  }
+  .kpi-label { font-size: 12px; color: var(--muted); line-height: 1.3; }
+  .kpi-value { font-size: 24px; color: var(--primary-deep); margin-top: 4px; word-break: break-word; }
+  .event-list { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .event-list td { padding: 7px 4px; border-bottom: 1px solid var(--border); }
+  .event-list td:last-child { text-align: right; font-weight: 700; color: var(--primary-deep); }
+  .trend-box { background: var(--bg); border: 1px solid var(--border); border-radius: 12px; padding: 10px; font-size: 12px; color: var(--muted); }
+  .trend-box svg { display: block; width: 100%; height: auto; }
+  #adminScreen .btn-profile-back { margin-top: 22px; }
 </style>
 
 </head>
@@ -894,6 +954,76 @@
           </div>
         </div>
         <button type="button" class="btn-profile-back" id="profileBackBtn">Back to Timer</button>
+        <button type="button" class="admin-link" id="adminLink">Admin Analytics</button>
+      </div>
+    </section>
+
+    <!-- ADMIN ANALYTICS (real GA4 data only; never fabricated) -->
+    <section id="adminScreen" class="hidden">
+      <div class="admin-card">
+        <h2>Admin Analytics</h2>
+        <p class="admin-sub">Anonymous application usage from Google Analytics 4. No patient or clinical information is collected.</p>
+        <div class="admin-status" id="adminStatus"></div>
+        <div class="admin-key hidden" id="adminKeyRow">
+          <input type="password" id="adminKeyInput" placeholder="Access key" autocomplete="off">
+          <button type="button" class="admin-btn" id="adminKeyBtn">Load</button>
+        </div>
+
+        <div class="range-row" id="rangeRow">
+          <button type="button" class="range-btn active" data-range="today">Today</button>
+          <button type="button" class="range-btn" data-range="7">Last 7 Days</button>
+          <button type="button" class="range-btn" data-range="30">Last 30 Days</button>
+          <button type="button" class="range-btn" data-range="custom">Custom</button>
+        </div>
+        <div class="custom-range hidden" id="customRange">
+          <input type="date" id="rangeStart" aria-label="Start date">
+          <input type="date" id="rangeEnd" aria-label="End date">
+          <button type="button" class="admin-btn" id="rangeApply">Apply</button>
+        </div>
+
+        <div class="admin-section">Overview</div>
+        <div class="kpi-grid">
+          <div class="kpi"><div class="kpi-label">👤 Total Users</div><div class="kpi-value" data-k="totalUsers">—</div></div>
+          <div class="kpi"><div class="kpi-label">🟢 Active Users Today</div><div class="kpi-value" data-k="activeUsersToday">—</div></div>
+          <div class="kpi"><div class="kpi-label">🆕 New Users</div><div class="kpi-value" data-k="newUsers">—</div></div>
+          <div class="kpi"><div class="kpi-label">📊 Sessions</div><div class="kpi-value" data-k="sessions">—</div></div>
+          <div class="kpi"><div class="kpi-label">⏱️ Average Engagement Time</div><div class="kpi-value" data-k="avgEngagement">—</div></div>
+        </div>
+
+        <div class="admin-section">Tool Usage</div>
+        <div class="kpi-grid">
+          <div class="kpi"><div class="kpi-label">🩸 Transfusions Started</div><div class="kpi-value" data-e="transfusion_started">—</div></div>
+          <div class="kpi"><div class="kpi-label">✅ Vital Checks Completed</div><div class="kpi-value" data-e="vital_check_completed">—</div></div>
+          <div class="kpi"><div class="kpi-label">Transfusions Ended</div><div class="kpi-value" data-e="transfusion_ended">—</div></div>
+          <div class="kpi"><div class="kpi-label">⚠️ Reactions Opened</div><div class="kpi-value" data-e="reaction_opened">—</div></div>
+          <div class="kpi"><div class="kpi-label">Reaction Checklist Items Completed</div><div class="kpi-value" data-e="reaction_item_completed">—</div></div>
+          <div class="kpi"><div class="kpi-label">Developer Profile Clicks</div><div class="kpi-value" data-e="developer_profile_clicked">—</div></div>
+        </div>
+
+        <div class="admin-section">Device Usage</div>
+        <div class="kpi-grid">
+          <div class="kpi"><div class="kpi-label">📱 Mobile Usage</div><div class="kpi-value" data-d="mobile">—</div></div>
+          <div class="kpi"><div class="kpi-label">💻 Desktop Usage</div><div class="kpi-value" data-d="desktop">—</div></div>
+          <div class="kpi"><div class="kpi-label">Tablet Usage</div><div class="kpi-value" data-d="tablet">—</div></div>
+        </div>
+
+        <div class="admin-section">Time Period</div>
+        <div class="kpi-grid">
+          <div class="kpi"><div class="kpi-label">Users Today</div><div class="kpi-value" data-p="usersToday">—</div></div>
+          <div class="kpi"><div class="kpi-label">Transfusions Today</div><div class="kpi-value" data-p="transfusionsToday">—</div></div>
+          <div class="kpi"><div class="kpi-label">Users This Week</div><div class="kpi-value" data-p="usersWeek">—</div></div>
+          <div class="kpi"><div class="kpi-label">Transfusions This Week</div><div class="kpi-value" data-p="transfusionsWeek">—</div></div>
+          <div class="kpi"><div class="kpi-label">Users This Month</div><div class="kpi-value" data-p="usersMonth">—</div></div>
+          <div class="kpi"><div class="kpi-label">Transfusions This Month</div><div class="kpi-value" data-p="transfusionsMonth">—</div></div>
+        </div>
+
+        <div class="admin-section">User Activity Trend</div>
+        <div class="trend-box" id="trendBox">No data available.</div>
+
+        <div class="admin-section">Analytics Events</div>
+        <table class="event-list" id="eventList"></table>
+
+        <button type="button" class="btn-profile-back" id="adminBackBtn">Back</button>
       </div>
     </section>
   </main>
@@ -987,6 +1117,7 @@
   var newSessionBtn = document.getElementById('newSessionBtn');
 
   var profileScreen = document.getElementById('profileScreen');
+  var adminScreen = document.getElementById('adminScreen');
   var devLink = document.getElementById('devLink');
   var profileBackBtn = document.getElementById('profileBackBtn');
 
@@ -1327,6 +1458,7 @@
     if (!evt || evt.status === 'completed') return;
     evt.status = 'completed';
     evt.completedAt = new Date();
+    track('vital_check_completed');
     render();
   }
 
@@ -1339,6 +1471,7 @@
     cb.checked = checked;
     cb.addEventListener('change', function(){
       reactionChecked[item.id] = cb.checked;
+      if (cb.checked) track('reaction_item_completed');
       renderReactionList();
     });
     var span = document.createElement('span');
@@ -1440,19 +1573,27 @@
     sessionEndTime = new Date();
     isPaused = true;
     renderSummary();
+    track('transfusion_ended');
     navigate('summary');
   }
+
+  // ---------- Analytics (GA4, anonymous usage only) ----------
+  // Never pass patient, clinical, free-text or identifying data in params.
+  function track(name, params) {
+    try { if (typeof window.gtag === 'function') window.gtag('event', name, params || {}); } catch (e) {}
+  }
+  var DURATION_OPTION = { '120': '2hr', '180': '3hr', '240': '4hr', 'custom': 'customized' };
 
   // ---------- Internal navigation (History API) ----------
   // Every screen change is a history entry, so the browser/iPhone Back button
   // moves between screens INSIDE the app. View changes only show/hide
   // sections; they never touch timer, schedule, CHECK, PAUSE or reaction state.
-  var VIEW_ORDER = ['setup', 'monitoring', 'reaction', 'summary', 'developer'];
+  var VIEW_ORDER = ['setup', 'monitoring', 'reaction', 'summary', 'developer', 'admin'];
   var currentView = 'setup';
 
   function viewElement(view) {
     return { setup: setupScreen, monitoring: activeScreen, reaction: reactionScreen,
-             summary: summaryScreen, developer: profileScreen }[view];
+             summary: summaryScreen, developer: profileScreen, admin: adminScreen }[view];
   }
   function currentIdx() {
     return (history.state && typeof history.state.idx === 'number') ? history.state.idx : 0;
@@ -1460,7 +1601,7 @@
   // Maps a requested view to one that is valid for the current session.
   function resolveView(view) {
     if (VIEW_ORDER.indexOf(view) === -1) return 'setup';
-    if (view === 'developer' || view === 'setup') return view;
+    if (view === 'developer' || view === 'setup' || view === 'admin') return view;
     if (!startTime) return 'setup';
     if (sessionEndTime) return 'summary';
     if (view === 'summary') return 'monitoring';
@@ -1471,7 +1612,10 @@
     view = resolveView(view);
     VIEW_ORDER.forEach(function(v){ viewElement(v).classList.add('hidden'); });
     viewElement(view).classList.remove('hidden');
+    var previousView = currentView;
     currentView = view;
+    if (view === 'monitoring' && previousView !== 'monitoring') track('monitoring_opened');
+    if (view === 'admin') adminOnShow();
     if (view === 'monitoring' && startTime) render();
     if (view === 'reaction' && startTime) renderReactionList();
     window.scrollTo(0, 0);
@@ -1541,6 +1685,7 @@
     if (tickHandle) clearInterval(tickHandle);
     tick();
     tickHandle = setInterval(tick, 1000);
+    track('transfusion_started', { transfusion_duration_option: DURATION_OPTION[durationSelect.value] || 'customized' });
     navigate('monitoring');
   }
 
@@ -1551,10 +1696,12 @@
       statusPill.className = 'status-pill paused';
       pauseBtn.textContent = 'RESUME TIMER';
       alertBanner.classList.add('hidden');
+      track('transfusion_paused');
     } else {
       statusPill.textContent = 'Active';
       statusPill.className = 'status-pill active';
       pauseBtn.textContent = 'PAUSE TIMER';
+      track('transfusion_resumed');
       render();
     }
     // Note: pausing only stops new alerts from firing. The monitoring
@@ -1585,6 +1732,7 @@
   function openReaction() {
     reactionOpened = true;
     renderReactionList();
+    track('reaction_opened');
     navigate('reaction');
   }
 
@@ -1607,9 +1755,148 @@
   function openProfile() { navigate('developer'); }
   function closeProfile() { goBackTo('developer', 'setup'); }
   devLink.addEventListener('click', function(){
+    // Fired only by a real click/tap on the footer button (not on display).
+    track('developer_profile_clicked');
+    track('developer_profile_opened');
     openProfile();
   });
   profileBackBtn.addEventListener('click', closeProfile);
+
+
+  // ---------- Admin Analytics (real GA4 data only) ----------
+  // GA4 reporting data cannot be read safely from a static page: the GA4 Data
+  // API needs credentials that must never be shipped in index.html. Set this
+  // to the URL of a secure server endpoint (see the setup notes) to enable
+  // real numbers. While empty, the dashboard shows "—" and says it is not
+  // connected. It NEVER shows demo or placeholder statistics.
+  var ANALYTICS_API_URL = '';
+
+  var ANALYTICS_EVENTS = ['tool_opened', 'transfusion_started', 'monitoring_opened',
+    'vital_check_completed', 'transfusion_paused', 'transfusion_resumed', 'transfusion_ended',
+    'reaction_opened', 'reaction_item_completed', 'developer_profile_opened', 'developer_profile_clicked'];
+
+  var adminStatus = document.getElementById('adminStatus');
+  var adminKeyRow = document.getElementById('adminKeyRow');
+  var adminKeyInput = document.getElementById('adminKeyInput');
+  var customRangeEl = document.getElementById('customRange');
+  var adminRange = 'today';
+  var adminKey = ''; // held in memory only, never stored
+
+  function fmtNum(n) { return (typeof n === 'number' && isFinite(n)) ? n.toLocaleString('en-US') : '—'; }
+  function fmtSeconds(sec) {
+    if (typeof sec !== 'number' || !isFinite(sec)) return '—';
+    var m = Math.floor(sec / 60), s = Math.round(sec % 60);
+    return m + 'm ' + (s < 10 ? '0' : '') + s + 's';
+  }
+  function setText(sel, val) {
+    Array.prototype.forEach.call(adminScreen.querySelectorAll(sel), function(el){ el.textContent = val; });
+  }
+  function adminStatusMsg(text, ok) {
+    adminStatus.textContent = text;
+    adminStatus.className = 'admin-status' + (ok ? ' ok' : '');
+  }
+
+  function renderEventList(events) {
+    var table = document.getElementById('eventList');
+    table.innerHTML = '';
+    ANALYTICS_EVENTS.forEach(function(name){
+      var tr = document.createElement('tr');
+      var a = document.createElement('td'); a.textContent = name;
+      var b = document.createElement('td');
+      b.textContent = events ? fmtNum(events[name]) : '—';
+      tr.appendChild(a); tr.appendChild(b); table.appendChild(tr);
+    });
+  }
+
+  function renderTrend(trend) {
+    var box = document.getElementById('trendBox');
+    if (!trend || !trend.length) { box.textContent = 'No data available.'; return; }
+    var W = 300, H = 110, pad = 18;
+    var max = Math.max.apply(null, trend.map(function(t){ return t.activeUsers || 0; })) || 1;
+    var bw = (W - pad * 2) / trend.length;
+    var bars = trend.map(function(t, i){
+      var h = Math.max(1, ((t.activeUsers || 0) / max) * (H - pad * 2));
+      return '<rect x="' + (pad + i * bw + 1) + '" y="' + (H - pad - h) + '" width="' + Math.max(1, bw - 2) +
+        '" height="' + h + '" rx="2" fill="#6557e6"><title>' + String(t.date).replace(/[<>&]/g, '') + ': ' + (t.activeUsers || 0) + '</title></rect>';
+    }).join('');
+    box.innerHTML = '<svg viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="Active users over time">' + bars +
+      '<line x1="' + pad + '" y1="' + (H - pad) + '" x2="' + (W - pad) + '" y2="' + (H - pad) + '" stroke="#e6e1f2"/></svg>' +
+      '<div>Active users per day (max ' + fmtNum(max) + ')</div>';
+  }
+
+  function renderAnalytics(d) {
+    d = d || {};
+    var o = d.overview || {}, ev = d.events || null, dev = d.devices || {}, per = d.period || {};
+    setText('[data-k="totalUsers"]', fmtNum(o.totalUsers));
+    setText('[data-k="activeUsersToday"]', fmtNum(o.activeUsersToday));
+    setText('[data-k="newUsers"]', fmtNum(o.newUsers));
+    setText('[data-k="sessions"]', fmtNum(o.sessions));
+    setText('[data-k="avgEngagement"]', fmtSeconds(o.avgEngagementSeconds));
+    ANALYTICS_EVENTS.forEach(function(name){
+      setText('[data-e="' + name + '"]', ev ? fmtNum(ev[name]) : '—');
+    });
+    ['mobile', 'desktop', 'tablet'].forEach(function(k){
+      var pct = '—';
+      if (typeof dev[k] === 'number' && typeof o.totalUsers === 'number' && o.totalUsers > 0) {
+        pct = (dev[k] / o.totalUsers * 100).toFixed(1) + '%';
+      }
+      setText('[data-d="' + k + '"]', pct);
+    });
+    ['usersToday', 'usersWeek', 'usersMonth', 'transfusionsToday', 'transfusionsWeek', 'transfusionsMonth'].forEach(function(k){
+      setText('[data-p="' + k + '"]', fmtNum(per[k]));
+    });
+    renderTrend(d.trend);
+    renderEventList(ev);
+  }
+
+  function isoDate(d) { return d.getFullYear() + '-' + ('0' + (d.getMonth() + 1)).slice(-2) + '-' + ('0' + d.getDate()).slice(-2); }
+  function currentRangeParams() {
+    var end = new Date(), start = new Date();
+    if (adminRange === '7') start.setDate(end.getDate() - 6);
+    else if (adminRange === '30') start.setDate(end.getDate() - 29);
+    else if (adminRange === 'custom') {
+      var s = document.getElementById('rangeStart').value, e = document.getElementById('rangeEnd').value;
+      if (!s || !e || s > e) return null;
+      return { start: s, end: e };
+    }
+    return { start: isoDate(start), end: isoDate(end) };
+  }
+
+  function loadAnalytics() {
+    renderAnalytics(null);
+    if (!ANALYTICS_API_URL) {
+      adminKeyRow.classList.add('hidden');
+      adminStatusMsg('Not connected. Google Analytics 4 is collecting events, but this page has no secure reporting endpoint yet, so no numbers are shown. Open Google Analytics to view data until the endpoint is connected.', false);
+      return;
+    }
+    adminKeyRow.classList.remove('hidden');
+    var r = currentRangeParams();
+    if (!r) { adminStatusMsg('Choose a valid start and end date.', false); return; }
+    if (!adminKey) { adminStatusMsg('Enter the access key to load analytics.', false); return; }
+    adminStatusMsg('Loading…', false);
+    fetch(ANALYTICS_API_URL + '?start=' + encodeURIComponent(r.start) + '&end=' + encodeURIComponent(r.end),
+      { headers: { 'Authorization': 'Bearer ' + adminKey } })
+      .then(function(res){ if (!res.ok) throw new Error('HTTP ' + res.status); return res.json(); })
+      .then(function(data){ renderAnalytics(data); adminStatusMsg('Live data from Google Analytics 4 (' + r.start + ' to ' + r.end + ').', true); })
+      .catch(function(){ renderAnalytics(null); adminStatusMsg('Could not load analytics (connection or access key problem). No data is shown.', false); });
+  }
+  function adminOnShow() { loadAnalytics(); }
+
+  Array.prototype.forEach.call(document.querySelectorAll('#rangeRow .range-btn'), function(btn){
+    btn.addEventListener('click', function(){
+      adminRange = btn.getAttribute('data-range');
+      Array.prototype.forEach.call(document.querySelectorAll('#rangeRow .range-btn'), function(b){ b.classList.toggle('active', b === btn); });
+      customRangeEl.classList.toggle('hidden', adminRange !== 'custom');
+      if (adminRange !== 'custom') loadAnalytics();
+    });
+  });
+  document.getElementById('rangeApply').addEventListener('click', loadAnalytics);
+  document.getElementById('adminKeyBtn').addEventListener('click', function(){ adminKey = adminKeyInput.value; loadAnalytics(); });
+  document.getElementById('adminLink').addEventListener('click', function(){ navigate('admin'); });
+  document.getElementById('adminBackBtn').addEventListener('click', function(){ goBackTo('admin', 'developer'); });
+
+  // App opened (once per page load).
+  track('tool_opened');
 
   // Keep the display fresh if the tab regains focus (e.g. iOS Safari
   // throttles timers in the background; catch up immediately on return).
