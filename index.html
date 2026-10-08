@@ -690,6 +690,25 @@
     align-items: flex-start;
     gap: 10px;
   }
+  /* Patient and Family Education confirmation (not a vital-sign check) */
+  .education-item {
+    width: 100%; text-align: left; font: inherit;
+    background: #FFB7CE; border: 1.5px solid #FFB7CE; color: var(--text);
+    border-radius: 12px; padding: 14px;
+    display: flex; align-items: flex-start; gap: 10px; cursor: pointer;
+  }
+  .education-item:active { transform: scale(0.99); }
+  .education-item.done { border-color: var(--completed); }
+  .education-box {
+    flex-shrink: 0; width: 26px; height: 26px; border-radius: 7px;
+    border: 2px solid var(--text); background: #fff; color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px; font-weight: 900; line-height: 1;
+  }
+  .education-item.done .education-box { background: var(--completed); border-color: var(--completed); }
+  .education-title { font-size: 15px; font-weight: 800; color: var(--text); }
+  .education-text { font-size: 14px; margin-top: 2px; line-height: 1.35; color: var(--text); }
+  .education-done-label { font-size: 12px; font-weight: 800; color: var(--completed); margin-top: 6px; }
   .reminder-icon {
     flex-shrink: 0;
     font-size: 18px;
@@ -1069,12 +1088,12 @@
     { id: 2,  text: "Assess vital signs." },
     { id: 3,  text: "Notify the attending physician." },
     { id: 4,  text: "Maintain IV access." },
-    { id: 5,  text: "Investigation:", subGroups: [
+    { id: 5,  text: "Recheck patient and blood unit details." },
+    { id: 6,  text: "Investigation:", subGroups: [
         { label: "To Blood Bank:", items: ["Urine", "Cross Match"] },
         { label: "To Laboratory:", items: ["CBC", "Culture", "Plain Tube", "Urine"] }
       ]
     },
-    { id: 6,  text: "Recheck patient and blood unit details." },
     { id: 7,  text: "Fill up the Transfusion Reaction Form on the system (in BT Module)." },
     { id: 8,  text: "Initiate (OVR) Occurrence Variance Report (Done by Nurse or Doctor)." },
     { id: 9,  text: "Blood Transfusion Event Report Form (Done by Doctor)." },
@@ -1093,6 +1112,7 @@
   var audioCtx = null;
   var reactionChecked = {};  // { id: true/false }
   var reactionOpened = false;
+  var educationDone = false; // Patient and Family Education confirmation (not part of the schedule)
 
   // ---------- Elements ----------
   var setupScreen = document.getElementById('setupScreen');
@@ -1341,6 +1361,39 @@
   // directly after whichever check happens to be the final scheduled one
   // for the selected End At — it never introduces an extra +15/30/60
   // check of its own.
+  function buildEducationItem() {
+    var item = document.createElement('button');
+    item.type = 'button';
+    item.className = 'education-item' + (educationDone ? ' done' : '');
+    item.setAttribute('role', 'checkbox');
+    item.setAttribute('aria-checked', educationDone ? 'true' : 'false');
+
+    var box = document.createElement('div');
+    box.className = 'education-box';
+    box.textContent = educationDone ? '✓' : '';
+    item.appendChild(box);
+
+    var body = document.createElement('div');
+    var title = document.createElement('div');
+    title.className = 'education-title';
+    title.textContent = 'Patient and Family Education';
+    body.appendChild(title);
+    var text = document.createElement('div');
+    text.className = 'education-text';
+    text.textContent = 'Educate the patient and family about blood transfusion and potential transfusion reactions.';
+    body.appendChild(text);
+    if (educationDone) {
+      var lbl = document.createElement('div');
+      lbl.className = 'education-done-label';
+      lbl.textContent = 'Completed';
+      body.appendChild(lbl);
+    }
+    item.appendChild(body);
+
+    item.addEventListener('click', function(){ educationDone = !educationDone; render(); });
+    return item;
+  }
+
   function buildReminderItem(text) {
     var item = document.createElement('div');
     item.className = 'reminder-item';
@@ -1395,6 +1448,7 @@
     }
 
     timelineEl.innerHTML = '';
+    timelineEl.appendChild(buildEducationItem());
     timelineEl.appendChild(buildReminderItem('Check Vital Sign Before going down to Blood Bank'));
     events.forEach(function(evt){
       var item = document.createElement('div');
@@ -1695,6 +1749,7 @@
     isPaused = false;
     reactionChecked = {};
     reactionOpened = false;
+    educationDone = false;
 
     ensureAudioCtx();
     requestNotificationPermission();
@@ -1738,6 +1793,7 @@
     isPaused = false;
     reactionChecked = {};
     reactionOpened = false;
+    educationDone = false;
     pauseBtn.textContent = 'PAUSE TIMER';
     alertBanner.classList.add('hidden');
     resetModal.classList.add('hidden');
