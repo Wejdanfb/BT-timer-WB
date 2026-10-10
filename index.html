@@ -16,34 +16,35 @@
 <style>
   :root{
     /* Palette sourced from the uploaded reference image */
-    --primary-deep:#3735ce;   /* deep indigo-blue — header, headings, baseline */
-    --primary:#6557e6;        /* vivid blue-violet — primary interactive color */
-    --primary-light:#9178fc;  /* light violet — gradient highlight */
-    --primary-tint:#ecebfc;   /* pale violet background tint */
-    --secondary-plum:#7a3f76; /* deep plum/violet — secondary actions, accents */
-    --plum-tint:#f4eaf3;      /* pale plum background tint */
-    --accent-mauve:#b26f7c;   /* dusty rose / muted mauve — soft accents */
-    --mauve-tint:#fbeef0;     /* pale mauve background tint */
+    --primary-deep:#2E365A;   /* deep indigo-blue — header, headings, baseline */
+    --primary:#3F5B8D;        /* vivid blue-violet — primary interactive color */
+    --primary-light:#6F86AE;  /* light violet — gradient highlight */
+    --primary-tint:#E9EDF5;   /* pale violet background tint */
+    --secondary-plum:#6B597F; /* deep plum/violet — secondary actions, accents */
+    --plum-tint:#F3EAF0;      /* pale plum background tint */
+    --accent-mauve:#BD6C73;   /* dusty rose / muted mauve — soft accents */
+    --mauve-tint:#F7EAEB;     /* pale mauve background tint */
     --bg:#f7f6fc;             /* near-white, faint lavender cast */
     --card:#ffffff;
-    --border:#e6e1f2;
-    --text:#241f3d;           /* deep indigo-black — strong contrast body text */
+    --border:#E7E1F5;
+    --text:#2E365A;           /* deep indigo-black — strong contrast body text */
     --muted:#5b5470;          /* muted violet-gray — labels, secondary text */
 
     /* Monitoring-interval color code — no red anywhere in this set.
        Each has a WCAG AA-passing (4.5:1+) text/button contrast on white. */
-    --interval-baseline:#3735ce; /* dark indigo — baseline reading */
-    --interval-15:#1d5fd1;       /* blue — every 15 min, hour 1 */
-    --interval-15-tint:#e8effc;
-    --interval-30:#7440c2;       /* purple — every 30 min, hours 2-3 */
-    --interval-30-tint:#f1e9fa;
-    --interval-60:#0e7a72;       /* teal/green — every 60 min, hour 4+ */
-    --interval-60-tint:#e3f3f1;
+    --interval-baseline:#2E365A; /* dark indigo — baseline reading */
+    --interval-15:#3F5B8D;       /* blue — every 15 min, hour 1 */
+    --interval-15-tint:#E8EDF5;
+    --interval-30:#6B597F;       /* purple — every 30 min, hours 2-3 */
+    --interval-30-tint:#EFEBF3;
+    --interval-60:#92A1C2;       /* teal/green — every 60 min, hour 4+ */
+    --interval-60-tint:#EEF1F7;
+    --interval-60-text:#4F6089;  /* darker shade of Soft Blue for readable text (#92A1C2 on white is 2.6:1) */
 
     /* Completion state keeps its own established green — a universal
        "done" convention, distinct from the interval color system above. */
-    --completed:#1e7e4f;
-    --completed-bg:#eaf7f0;
+    --completed:#498428;
+    --completed-bg:#F3F8F0;
 
     /* Reaction warning — amber only, never used for monitoring/timing. */
     --warn-amber:#8a5a00;
@@ -53,12 +54,13 @@
     /* Destructive action (Reset) — kept red as a standard, unrelated to
        the monitoring color system, which the spec's "no red" rule governs. */
     --due:#c0392b;
+    --missed:#A9433B;         /* Not Completed status on the summary page */
     --due-bg:#fdecea;
 
     /* Pre-Baseline / Post-BT reminders — reuse the same amber family as
        the Reaction alert (never red, never part of the monitoring-
        interval color system). */
-    --shadow: 0 2px 10px rgba(55,53,206,0.12);
+    --shadow: 0 2px 10px rgba(46,54,90,0.12);
   }
   *, *::before, *::after { box-sizing: border-box; }
   html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
@@ -176,11 +178,11 @@
     font-size: 17px;
     font-weight: 700;
     color: #fff;
-    background: linear-gradient(135deg, var(--primary-deep), var(--primary));
+    background: #3F5B8D;
     border-radius: 12px;
     margin-top: 20px;
     letter-spacing: 0.4px;
-    box-shadow: 0 3px 10px rgba(101,87,230,0.35);
+    box-shadow: 0 3px 10px rgba(63,91,141,0.35);
   }
   .btn-primary:active { transform: scale(0.98); }
 
@@ -315,24 +317,24 @@
     animation: pulseIndigo 1.4s infinite;
   }
   @keyframes pulseIndigo {
-    0% { box-shadow: 0 0 0 0 rgba(55,53,206,0.3); }
-    70% { box-shadow: 0 0 0 10px rgba(55,53,206,0); }
-    100% { box-shadow: 0 0 0 0 rgba(55,53,206,0); }
+    0% { box-shadow: 0 0 0 0 rgba(46,54,90,0.3); }
+    70% { box-shadow: 0 0 0 10px rgba(46,54,90,0); }
+    100% { box-shadow: 0 0 0 0 rgba(46,54,90,0); }
   }
   @keyframes pulse15 {
-    0% { box-shadow: 0 0 0 0 rgba(29,95,209,0.35); }
-    70% { box-shadow: 0 0 0 10px rgba(29,95,209,0); }
-    100% { box-shadow: 0 0 0 0 rgba(29,95,209,0); }
+    0% { box-shadow: 0 0 0 0 rgba(63,91,141,0.35); }
+    70% { box-shadow: 0 0 0 10px rgba(63,91,141,0); }
+    100% { box-shadow: 0 0 0 0 rgba(63,91,141,0); }
   }
   @keyframes pulse30 {
-    0% { box-shadow: 0 0 0 0 rgba(116,64,194,0.35); }
-    70% { box-shadow: 0 0 0 10px rgba(116,64,194,0); }
-    100% { box-shadow: 0 0 0 0 rgba(116,64,194,0); }
+    0% { box-shadow: 0 0 0 0 rgba(107,89,127,0.35); }
+    70% { box-shadow: 0 0 0 10px rgba(107,89,127,0); }
+    100% { box-shadow: 0 0 0 0 rgba(107,89,127,0); }
   }
   @keyframes pulse60 {
-    0% { box-shadow: 0 0 0 0 rgba(14,122,114,0.35); }
-    70% { box-shadow: 0 0 0 10px rgba(14,122,114,0); }
-    100% { box-shadow: 0 0 0 0 rgba(14,122,114,0); }
+    0% { box-shadow: 0 0 0 0 rgba(146,161,194,0.35); }
+    70% { box-shadow: 0 0 0 10px rgba(146,161,194,0); }
+    100% { box-shadow: 0 0 0 0 rgba(146,161,194,0); }
   }
 
   .timeline {
@@ -358,7 +360,14 @@
   .event-item.type-30 { border-left-color: var(--interval-30); }
   .event-item.type-60 { border-left-color: var(--interval-60); }
 
-  .event-item.upcoming { opacity: 0.9; }
+  .event-item.upcoming { opacity: 1; }
+  .event-item.upcoming.type-15 { background: var(--interval-15-tint); }
+  .event-item.upcoming.type-30 { background: var(--interval-30-tint); }
+  .event-item.upcoming.type-60 { background: var(--interval-60-tint); }
+  .event-item.type-15 .event-label { color: var(--interval-15); font-weight: 600; }
+  .event-item.type-30 .event-label { color: var(--interval-30); font-weight: 600; }
+  .event-item.type-60 .event-label { color: var(--interval-60-text); font-weight: 600; }
+  .event-item.completed .event-label { color: var(--muted); font-weight: 400; }
 
   .event-item.due.type-15 { border-color: var(--interval-15); background: var(--interval-15-tint); animation: pulse15 1.4s infinite; }
   .event-item.due.type-30 { border-color: var(--interval-30); background: var(--interval-30-tint); animation: pulse30 1.4s infinite; }
@@ -377,7 +386,11 @@
   }
   .event-item.due.type-15 .event-time { color: var(--interval-15); }
   .event-item.due.type-30 .event-time { color: var(--interval-30); }
-  .event-item.due.type-60 .event-time { color: var(--interval-60); }
+  .event-item.due.type-60 .event-time { color: var(--interval-60-text); }
+  .event-item.upcoming.type-15 .event-time { color: var(--interval-15); }
+  .event-item.upcoming.type-30 .event-time { color: var(--interval-30); }
+  .event-item.upcoming.type-60 .event-time { color: var(--interval-60-text); }
+  .event-item.completed.type-15 .event-time, .event-item.completed.type-30 .event-time, .event-item.completed.type-60 .event-time,
   .event-item.completed .event-time { color: var(--completed); }
   .event-item.type-baseline .event-time { color: var(--interval-baseline); }
   .event-label {
@@ -404,7 +417,7 @@
   }
   .badge-due.type-15 { background: var(--interval-15); }
   .badge-due.type-30 { background: var(--interval-30); }
-  .badge-due.type-60 { background: var(--interval-60); }
+  .badge-due.type-60 { background: var(--interval-60); color: var(--primary-deep); }
 
   .badge-baseline {
     display:inline-block;
@@ -430,7 +443,7 @@
   }
   .btn-check.type-15 { background: var(--interval-15); }
   .btn-check.type-30 { background: var(--interval-30); }
-  .btn-check.type-60 { background: var(--interval-60); }
+  .btn-check.type-60 { background: var(--interval-60); color: var(--primary-deep); }
   .btn-check:active { transform: scale(0.96); }
 
   .check-mark {
@@ -452,7 +465,7 @@
     font-size: 15px;
     font-weight: 800;
     color: #fff;
-    background: var(--secondary-plum);
+    background: #6B597F;
     border-radius: 12px;
     letter-spacing: 0.4px;
     margin-bottom: 10px;
@@ -464,9 +477,9 @@
     padding: 14px;
     font-size: 14.5px;
     font-weight: 800;
-    color: var(--warn-amber);
-    background: var(--warn-amber-bg);
-    border: 1.5px solid var(--warn-amber-border);
+    color: #805B19;
+    background: #F8EBCB;
+    border: 1.5px solid #E5C77B;
     border-radius: 12px;
     margin-bottom: 10px;
     letter-spacing: 0.3px;
@@ -489,14 +502,14 @@
     color: var(--primary-deep);
   }
   .btn-secondary.warn {
-    color: var(--secondary-plum);
-    border-color: var(--accent-mauve);
-    background: var(--mauve-tint);
+    color: #6B597F;
+    border-color: #6B597F;
+    background: #F3EAF0;
   }
   .btn-secondary.danger {
-    color: var(--due);
-    border-color: #f0c6c1;
-    background: var(--due-bg);
+    color: #A9433B;
+    border-color: #BD6C73;
+    background: #FBECEA;
   }
   .btn-secondary:active { transform: scale(0.97); }
 
@@ -653,7 +666,7 @@
     letter-spacing: 0.3px;
   }
   table.summary-table td.status-completed { color: var(--completed); font-weight: 700; }
-  table.summary-table td.status-missed { color: var(--due); font-weight: 700; }
+  table.summary-table td.status-missed { color: var(--missed); font-weight: 700; }
   .type-dot {
     display: inline-block;
     width: 8px;
@@ -693,22 +706,21 @@
   /* Patient and Family Education confirmation (not a vital-sign check) */
   .education-item {
     width: 100%; text-align: left; font: inherit;
-    background: #FFB7CE; border: 1.5px solid #FFB7CE; color: var(--text);
+    background: #BD6C73; border: 1.5px solid #BD6C73; color: #fff;
     border-radius: 12px; padding: 14px;
     display: flex; align-items: flex-start; gap: 10px; cursor: pointer;
   }
   .education-item:active { transform: scale(0.99); }
-  .education-item.done { border-color: var(--completed); }
+  .education-item.done { border-color: var(--completed); box-shadow: inset 0 0 0 1.5px var(--completed); }
   .education-box {
     flex-shrink: 0; width: 26px; height: 26px; border-radius: 7px;
-    border: 2px solid var(--text); background: #fff; color: #fff;
+    border: 2px solid #fff; background: #fff; color: var(--completed);
     display: flex; align-items: center; justify-content: center;
-    font-size: 16px; font-weight: 900; line-height: 1;
+    font-size: 17px; font-weight: 900; line-height: 1;
   }
-  .education-item.done .education-box { background: var(--completed); border-color: var(--completed); }
-  .education-title { font-size: 15px; font-weight: 800; color: var(--text); }
-  .education-text { font-size: 14px; margin-top: 2px; line-height: 1.35; color: var(--text); }
-  .education-done-label { font-size: 12px; font-weight: 800; color: var(--completed); margin-top: 6px; }
+  .education-title { font-size: 15px; font-weight: 800; color: #fff; }
+  .education-text { font-size: 14px; font-weight: 600; margin-top: 2px; line-height: 1.35; color: #fff; }
+  .education-done-label { font-size: 12px; font-weight: 800; color: #fff; margin-top: 6px; letter-spacing: .3px; }
   .reminder-icon {
     flex-shrink: 0;
     font-size: 18px;
@@ -775,7 +787,7 @@
   .btn-profile-back {
     width: 100%; padding: 15px; margin-top: 32px;
     font-size: 15px; color: #fff;
-    background: linear-gradient(135deg, var(--primary-deep), var(--primary));
+    background: #3F5B8D;
     border-radius: 12px; letter-spacing: 0.3px;
   }
   .btn-profile-back:active { transform: scale(0.98); }
@@ -823,7 +835,7 @@
   .admin-key { display: flex; gap: 8px; margin-bottom: 12px; }
   .admin-btn {
     padding: 10px 14px; font-size: 13px; color: #fff; border: none; border-radius: 10px;
-    background: linear-gradient(135deg, var(--primary-deep), var(--primary)); cursor: pointer;
+    background: #3F5B8D; cursor: pointer;
   }
   .kpi-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
   .kpi {
@@ -1292,13 +1304,14 @@
     return type + ' min';
   }
 
-  function typeColorHex(type) {
+  // Uses the shared interval color variables (same source as the timer page).
+  function typeColorVar(type) {
     switch (type) {
-      case 'baseline': return '#3735ce';
-      case '15': return '#1d5fd1';
-      case '30': return '#7440c2';
-      case '60': return '#0e7a72';
-      default: return '#6557e6';
+      case 'baseline': return 'var(--interval-baseline)';
+      case '15': return 'var(--interval-15)';
+      case '30': return 'var(--interval-30)';
+      case '60': return 'var(--interval-60)';
+      default: return 'var(--primary)';
     }
   }
 
@@ -1464,7 +1477,7 @@
 
       var labelEl = document.createElement('div');
       labelEl.className = 'event-label';
-      labelEl.textContent = evt.type === 'baseline' ? 'Baseline Reading' : 'Vital Signs Check';
+      labelEl.textContent = evt.type === 'baseline' ? 'Baseline Reading' : 'Vital Signs Check (' + evt.type + ' min)';
       main.appendChild(labelEl);
 
       if (evt.type === 'baseline') {
@@ -1618,7 +1631,7 @@
       var cellType = document.createElement('td');
       var dot = document.createElement('span');
       dot.className = 'type-dot';
-      dot.style.background = typeColorHex(evt.type);
+      dot.style.background = typeColorVar(evt.type);
       cellType.appendChild(dot);
       cellType.appendChild(document.createTextNode(typeLabel(evt.type)));
       row.appendChild(cellType);
