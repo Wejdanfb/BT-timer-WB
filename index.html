@@ -779,8 +779,9 @@
     margin-top: 12px;
     text-align: center;
   }
-  /* Image is trimmed to its visible content (no transparent padding), so it can fill the card width. */
-  .profile-photo { display: block; width: calc(100% + 32px); max-width: none; height: auto; margin: 0 -16px; }
+  /* Image is trimmed to its visible content (no transparent padding), so its width is the visible width:
+     ~70% of the card's outer width (content width + 44px padding + 2px border), capped at 320px. */
+  .profile-photo { display: block; width: min(320px, calc((100% + 46px) * 0.7)); max-width: 100%; height: auto; margin: 0 auto; }
   .profile-message {
     font-size: 15px; line-height: 1.65; color: var(--text);
     margin: 28px 0 0;
