@@ -235,6 +235,15 @@
     padding-top: 10px;
     font-style: italic;
   }
+  /* Same style as "After blood transfusion", placed first: divider sits below it instead of above. */
+  .policy-row.neutral.first {
+    border-top: none;
+    margin-top: 0;
+    padding-top: 7px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 4px;
+    padding-bottom: 10px;
+  }
 
   /* ---- Active screen (Page 2) ---- */
   .status-banner {
@@ -902,6 +911,7 @@
 
         <div class="policy-box">
           <div class="policy-title">Monitoring Policy</div>
+          <div class="policy-row neutral first">Baseline Before Starting Blood Transfusion</div>
           <div class="policy-row"><span class="policy-dot dot-15"></span><span>Every 15 minutes during the first hour</span></div>
           <div class="policy-row"><span class="policy-dot dot-30"></span><span>Every 30 minutes during the second and third hours</span></div>
           <div class="policy-row"><span class="policy-dot dot-60"></span><span>Every 60 minutes starting from the fourth hour</span></div>
