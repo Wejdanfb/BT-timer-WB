@@ -102,6 +102,15 @@
     font-weight: 700;
     letter-spacing: 0.2px;
   }
+  header.topbar h1 .home-link {
+    color: inherit; text-decoration: none; cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    transition: opacity 0.15s ease;
+  }
+  @media (hover: hover) {
+    header.topbar h1 .home-link:hover { opacity: 0.8; }
+  }
+  header.topbar h1 .home-link:focus-visible { outline: 2px solid rgba(255,255,255,0.8); outline-offset: 3px; border-radius: 4px; }
 
   main {
     flex: 1;
@@ -879,7 +888,7 @@
 
 <div id="app">
   <header class="topbar">
-    <h1>Blood Transfusion Vital Signs Timer</h1>
+    <h1><a id="homeLink" class="home-link" href="#setup">Blood Transfusion Timer</a></h1>
   </header>
 
   <main>
@@ -1776,6 +1785,13 @@
     if (!e.state || e.state.view !== shown) {
       try { history.replaceState({ view: shown, idx: (e.state && e.state.idx) || 0 }, '', '#' + shown); } catch (err) {}
     }
+  });
+  // Header title -> main/home screen via the same navigate() (no reload, no new
+  // tab, state untouched). Home is Setup before a session starts, otherwise the
+  // running timer (resolveView sends an ended session to its summary).
+  document.getElementById('homeLink').addEventListener('click', function(e){
+    e.preventDefault();
+    navigate(startTime ? 'monitoring' : 'setup');
   });
   // Initial entry is Setup (replace, not push: no extra history entry).
   try { history.replaceState({ view: 'setup', idx: 0 }, '', '#setup'); } catch (e) {}
